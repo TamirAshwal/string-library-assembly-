@@ -3,7 +3,7 @@
 .extern pstrlen
 .section .rodata
 case_31_print:
-    .string "in case 31 - pstrlen "
+    .string "in case 31 - pstrlen \n"
 case_33_print:
     .string "in case 33 - swapcase "
 case_34_print:
@@ -12,6 +12,8 @@ case_invalid_input_print:
     .string "case: invalid input \n"
 default_print:
     .string "default"
+pstrlen_message:
+    .string "first pstring length: %d, second pstring length: %d\n"
 
 .L4:
     .quad .case_31 # case 31 - pstrlen
@@ -25,18 +27,27 @@ default_print:
 run_func:
     pushq %rbp
     movq %rsp, %rbp
-    leaq -31(%rdi), %rsi
-    cmpq $3, %rsi
+    leaq -31(%rdi), %rax
+    cmpq $3, %rax
     ja .invalid_input
-    jmp *.L4(,%rsi,8)
+    jmp *.L4(,%rax,8)
     .invalid_input:
         movq $case_invalid_input_print, %rdi
         xorq %rax, %rax
         call printf
         jmp .done
     .case_31:
-        movq $case_31_print, %rdi
+        subq $8, %rsp
+        pushq %rsi
         xorq %rax, %rax
+        call pstrlen
+        movq %rax, %rsi
+        subq $8, %rsp
+        pushq %rdx
+        xorq %rax, %rax
+        call pstrlen
+        movq %rax, %rdx
+        movq $pstrlen_message, %rdi
         call printf
         jmp .done
     .case_32:
