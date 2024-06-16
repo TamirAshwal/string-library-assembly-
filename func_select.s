@@ -14,6 +14,10 @@ default_print:
     .string "default"
 pstrlen_message:
     .string "first pstring length: %d, second pstring length: %d\n"
+swapcase_message:
+    .string "length: %d, string: %s\n"
+check_message:
+    .string "length: %d\n"
 
 .L4:
     .quad .case_31 # case 31 - pstrlen
@@ -37,23 +41,50 @@ run_func:
         call printf
         jmp .done
     .case_31:
-        subq $8, %rsp
-        pushq %rsi
+        subq $8, %rsp #align the stack becuse we only push 1 value to the stack
+        pushq %rsi # push the first pstring to the stack
         xorq %rax, %rax
-        call pstrlen
+        call pstrlen #call pstrlen
         movq %rax, %rsi
-        subq $8, %rsp
-        pushq %rdx
+        subq $8, %rsp #align the stack becuse we only push 1 value to the stack
+        pushq %rdx # push the second pstring to the stack
         xorq %rax, %rax
-        call pstrlen
+        call pstrlen #call pstrlen
         movq %rax, %rdx
-        movq $pstrlen_message, %rdi
+        movq $pstrlen_message, %rdi #print the message
         call printf
-        jmp .done
+        jmp .done #exit the function
     .case_32:
         jmp .invalid_input
     .case_33:
-        movq $case_33_print, %rdi
+        subq $8, %rsp #align the stack becuse we only push 1 value to the stack
+        pushq %rsi # push the first pstring to the stack
+        movq %rdx, %r9 #save the second pstring in r9
+        xorq %rax, %rax
+        call pstrlen #call pstrlen
+        movq %rax, %r8
+        pushq %rsi
+        pushq %rax #push the length of the string to the stack
+        xorq %rax, %rax
+        call swapCase
+        movq $swapcase_message, %rdi
+        movq %rax, %rdx
+        movq %r8, %rsi
+        call printf
+
+        movq %r9, %rsi
+
+        pushq %rsi
+        xorq %rax, %rax
+        call pstrlen
+        movq %rax, %rsi # r8 has the length of the second string the string in rdx
+        pushq %rsi
+        pushq %rax
+        xorq %rax, %rax
+        call swapCase
+        movq %rax, %rdx
+        movq $swapcase_message, %rdi
+        movq %r8, %rsi
         xorq %rax, %rax
         call printf
         jmp .done
@@ -63,7 +94,6 @@ run_func:
         call printf
         jmp .done
     .done:
-
     movq %rbp, %rsp
     popq %rbp
     ret

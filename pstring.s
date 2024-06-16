@@ -3,6 +3,8 @@
 .section .rodata
 check_in_func:  
     .string "length in the function is %d\n"
+check_string_in_func:
+    .string "string in the function is %s\n"
 .section .text
 .type  pstrlen, @function
 .globl pstrlen
@@ -19,33 +21,47 @@ ret
 swapCase:
 pushq %rbp
 movq %rsp, %rbp
-movq 0x10(%rbp), %rdi
-movzbl (%rdi), %ecx
-
-leaq 1(%rsi), %rax # go the the beginning of the string 
+movq 0x10(%rbp), %rcx # the length of th string
+addq $1, %rcx
+movq 0x18(%rbp), %rsi # the begginning of the string
+movq 0x18(%rbp), %rdi # the begginning of the string
 .loop:
-    cmpb $0, %ecx
+    cmpq $0, %rcx
     je .end
+    movb (%rsi), %al
     cmpb $65, %al
-    jnae .next_letter
-    cmpb $123, %al
-    jae .next_letter
-    .check_1:
+    jb .next_letter
+    cmpb $122, %al
+    ja .next_letter
     cmpb $90, %al
-    jle .upper_to_lower
+    jbe .upper_to_lower
+    cmpb $97, %al
+    jae .lower_t0_upper
     jmp .next_letter
     .upper_to_lower:
-    addb $32, %al
-    jmp .next_letter
-    .lower_to_upper:
-    subb $32, %al
-    jmp .next_letter
+        addb $32, %al
+        movb %al, (%rsi)
+        jmp .next_letter
+    .lower_t0_upper:
+        subb $32, %al
+        movb %al, (%rsi)
+        jmp .next_letter
     .next_letter:
-    decb %cl
-    addq $1, %rax
-    jmp .loop
+        incq %rsi
+        decq %rcx
+        jmp .loop
+
+#movzbl (%rdi), %ecx
+#leaq 1(%rsi), %rsi # go the the beginning of the string
+#leaq 1(%rsi), %rax
+#movb (%rsi), %al
+#subb $32, %al
+
+
+    
 .end:
-movq %rbp, %rsp
+movq %rdi, %rax
+    movq %rbp, %rsp
     popq %rbp
     ret
 
