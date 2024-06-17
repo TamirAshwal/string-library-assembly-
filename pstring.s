@@ -66,4 +66,3 @@ movq %rdi, %rax
     movq %rbp, %rsp
     popq %rbp
     ret
-

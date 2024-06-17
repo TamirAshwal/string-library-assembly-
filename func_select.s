@@ -54,6 +54,8 @@ run_func:
     .case_32:
         jmp .invalid_input
     .case_33:
+    movq %rdx, %r13
+
         subq $8, %rsp
         pushq %rsi
         xorq %rax, %rax
@@ -66,10 +68,22 @@ run_func:
         movq $swapcase_message, %rdi
         xorq %rax, %rax
         call printf
-
-
+        movq %r13, %rsi
+        subq $8, %rsp
+        pushq %rsi
+        xorq %rax, %rax
+        xorq %rdi, %rdi
+        xorq %rdx, %rdx
+        call pstrlen
+        pushq %rsi
+        pushq %rax
+        xorq %rax, %rax
+        call swapCase
+        movq %rax, %rsi
+        movq $swapcase_message, %rdi
+        xorq %rax, %rax
+        call printf
         jmp .done
-
     .case_34:
         movq $case_34_print, %rdi
         xorq %rax, %rax
