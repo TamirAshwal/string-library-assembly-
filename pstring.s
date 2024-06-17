@@ -1,10 +1,8 @@
 .extern printf
 .extern scanf
 .section .rodata
-check_in_func:  
-    .string "length in the function is %d\n"
-check_string_in_func:
-    .string "string in the function is %s\n"
+length_message:  
+    .string "length: %d, "
 .section .text
 .type  pstrlen, @function
 .globl pstrlen
@@ -12,7 +10,7 @@ pstrlen:
 pushq %rbp
 movq %rsp, %rbp
 movq 0x10(%rbp), %rdi
-movb (%rdi), %al
+movzbl (%rdi), %eax
 movq %rbp, %rsp
 popq %rbp
 ret
@@ -21,10 +19,14 @@ ret
 swapCase:
 pushq %rbp
 movq %rsp, %rbp
-movq 0x10(%rbp), %rcx # the length of th string
-addq $1, %rcx
-movq 0x18(%rbp), %rsi # the begginning of the string
-movq 0x18(%rbp), %rdi # the begginning of the string
+movq 0x10(%rbp), %rsi # get the length of the string
+xorq %rax, %rax
+movq $length_message, %rdi
+call printf
+movq 0x10(%rbp), %rcx # the length of the string is in rcx
+movq 0x18(%rbp), %rsi # get the string
+leaq 1(%rsi), %rsi # go the the beginning of the string
+movq %rsi, %rdi
 .loop:
     cmpq $0, %rcx
     je .end
