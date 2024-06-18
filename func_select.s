@@ -16,6 +16,10 @@ pstrlen_message:
     .string "first pstring length: %d, second pstring length: %d\n"
 swapcase_message:
     .string "string: %s\n"
+case_34_user_format:
+    .string " %c %c"
+case_34_check:
+    .string "this is the first char: %c, the second character is: %c \n"
 .L4:
     .quad .case_31 # case 31 - pstrlen
     .quad .case_32 # invalid input 
@@ -54,40 +58,51 @@ run_func:
     .case_32:
         jmp .invalid_input
     .case_33:
-    movq %rdx, %r13
-
-        subq $8, %rsp
-        pushq %rsi
+        movq %rdx, %r13 # save the second pstring
+        subq $8, %rsp #align the stack becuse we only push 1 value to the stack
+        pushq %rsi # push the first pstring to the stack
         xorq %rax, %rax
         call pstrlen
-        pushq %rsi
-        pushq %rax
+        pushq %rsi # push the first pstring to the stack
+        pushq %rax # push the length of the first pstring to the stack
         xorq %rax, %rax
-        call swapCase
-        movq %rax, %rsi
+        call swapCase #call swapCase
+        movq %rax, %rsi # move the new string to rsi
         movq $swapcase_message, %rdi
         xorq %rax, %rax
-        call printf
-        movq %r13, %rsi
-        subq $8, %rsp
+        call printf #print the new string
+        movq %r13, %rsi # move the second pstring to rsi
+        subq $8, %rsp #align the stack becuse we only push 1 value to the stack
         pushq %rsi
-        xorq %rax, %rax
-        xorq %rdi, %rdi
+        xorq %rax, %rax 
+        xorq %rdi, %rdi 
         xorq %rdx, %rdx
         call pstrlen
-        pushq %rsi
-        pushq %rax
+        pushq %rsi # push the second pstring to the stack
+        pushq %rax # push the length of the second pstring to the stack
         xorq %rax, %rax
-        call swapCase
-        movq %rax, %rsi
-        movq $swapcase_message, %rdi
-        xorq %rax, %rax
-        call printf
-        jmp .done
+        call swapCase #call swapCase
+        movq %rax, %rsi # move the new string to rsi
+        movq $swapcase_message, %rdi #print the new string
+        xorq %rax, %rax 
+        call printf #print the new string
+        jmp .done #exit the function
     .case_34:
-        movq $case_34_print, %rdi
-        xorq %rax, %rax
-        call printf
+        subq    $16, %rsp
+        leaq    -1(%rbp), %rsi
+        leaq    -2(%rbp), %rdx
+        movl    $case_34_user_format, %edi
+        xorq    %rax, %rax
+        call    scanf
+        movzbl  -1(%rbp), %eax
+        movsbl  %al, %eax
+        movl    %eax, %esi
+        movzbl  -2(%rbp), %eax
+        movsbl  %al, %eax
+        movl    %eax, %edx
+        movl    $case_34_check, %edi
+        xorq    %rax, %rax
+        call    printf
         jmp .done
     .done:
     movq %rbp, %rsp
