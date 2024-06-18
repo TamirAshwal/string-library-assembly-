@@ -89,6 +89,8 @@ run_func:
         jmp .done #exit the function
     .case_34:
         subq    $16, %rsp
+        movq %rsi, %r12
+        movq %rdx, %r13
         leaq    -1(%rbp), %rsi
         leaq    -2(%rbp), %rdx
         movl    $case_34_user_format, %edi
@@ -96,13 +98,16 @@ run_func:
         call    scanf
         movzbl  -1(%rbp), %eax
         movsbl  %al, %eax
-        movl    %eax, %esi
+        movl    %eax, %esi # the first char
         movzbl  -2(%rbp), %eax
-        movsbl  %al, %eax
-        movl    %eax, %edx
-        movl    $case_34_check, %edi
-        xorq    %rax, %rax
-        call    printf
+        movsbl  %al, %eax 
+        movl    %eax, %edx # the second char
+        movl %edx, %ecx;
+        movl %esi, %edx;
+        movq %r12, %rdi
+        movq %r13, %rsi
+        pushq $8
+        call pstrijcpy
         jmp .done
     .done:
     movq %rbp, %rsp

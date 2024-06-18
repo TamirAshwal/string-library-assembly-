@@ -4,7 +4,7 @@
 length_message:  
     .string "length: %d, "
 case_34_check:
-    .string "this is the first char: %c, the second character is: %c \n"
+    .string "in the func this is the first char: %c, the second character is: %c \n"
 .section .text
 .type  pstrlen, @function
 .globl pstrlen
@@ -64,12 +64,13 @@ movq %rsi, %rdi
 .type  pstrijcpy, @function
 .globl pstrijcpy
 pstrijcpy:
-movq $case_34_check, %rdi
-movq (%rdx), %rsi
-movq %rcx, %rdx
+movl $case_34_check, %edi
+movl %edx, %esi
+movl %ecx, %edx
 xorq %rax, %rax
 call printf
 jmp .end
+
 .end:
 movq %rdi, %rax
     movq %rbp, %rsp
